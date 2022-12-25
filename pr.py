@@ -1,4 +1,4 @@
 n=5
-m=int(input())
+m=7
 r=n*m
 print(r)
