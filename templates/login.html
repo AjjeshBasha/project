@@ -269,19 +269,22 @@ input {
 
 <div class="cont">
   <div class="form sign-in">
+    <form action="/valid_login" method="POST">
     <h2>Welcome back,</h2>
     <label>
       <span>Email</span>
-      <input type="email" />
+      <input type="email" name="email" />
     </label>
     <label>
       <span>Password</span>
-      <input type="password" />
+      <input type="password" name="password"/>
     </label>
     <p class="forgot-pass">Forgot password?</p>
     <button type="button" class="submit">Sign In</button>
     <button type="button" class="fb-btn">Connect with <span>facebook</span></button>
+  </form>
   </div>
+
   <div class="sub-cont">
     <div class="img">
       <div class="img__text m--up">
@@ -297,22 +300,25 @@ input {
         <span class="m--in">Sign In</span>
       </div>
     </div>
-    <form action="/signin" method="POST">
+    <form action="/savedetails" method="POST">
     <div class="form sign-up">
       <h2>Register with your Details,</h2>
       <label>
         <span>Name</span>
-        <input name="name" type="text" required />
+        <input name="name" type="text" id="usernameField" onkeypress="validusername()" required />
+        <p id="usernameError"></p>
       </label>
       <label>
         <span>Email</span>
-        <input name="email" type="email" required/>
+        <input name="email" type="email" id="emailField" onkeypress="validemail()" required/>
+        <p id="emailError"></p>
       </label>
       <label>
         <span>Password</span>
-        <input name="password" type="password" required/>
+        <input name="password" type="password" id="passwordField" onkeypress="validpassword()" required/>
+        <p id="passwordError"></p>
       </label>
-      <button type="submit" class="submit">Sign Up</button>
+      <button type="submit" >Sign Up</button>
       
     </div>
   </form>
@@ -325,10 +331,6 @@ input {
 <a href="https://twitter.com/NikolayTalanov" target="_blank" class="icon-link icon-link--twitter">
   <img src="https://cdn1.iconfinder.com/data/icons/logotypes/32/twitter-128.png">
 </a>
-<script type="text/javascript">
-	document.querySelector('.img__btn').addEventListener('click', function() {
-  document.querySelector('.cont').classList.toggle('s--signup');
-});
-</script>
+<script src="static/js/form.js"></script>
 </body>
 </html>

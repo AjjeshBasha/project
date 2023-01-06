@@ -13,44 +13,69 @@
 
 
 import sqlite3
-from flask import Flask,render_template,url_for,request
+from flask import Flask,redirect,url_for,render_template,request,session
+def register_user_to_db(name,email,password):
+    con=sqlite3.connect('team8.db')
+    cur=con.cursor()
+    cur.execute('INSERT INTO users(name,email,password)values(?,?,?)',(name,email,password))
+    con.commit()
+    con.close()
+
+
+def check_user(email,password):
+    con=sqlite3.connect('team8.db')
+    cur=con.cursor()
+    cur.execute('Select email,password FROM users WHERE email=? and password=?',(email,password))
+
+    result=cur.fetchone()
+    if result:
+        return True
+    else:
+        return False    
 app = Flask(__name__)
-@app.route('/')
-def demo():
+app.secret_key="random"
+
+
+@app.route("/")
+def index():
     return render_template('index.html')
 
-@app.route('/login')
-def login():
-    return render_template('login.html')
+@app.route("/savedetails",methods=["POST","GET"])
+def savedetails():
+    if request.method=='POST':
+        name=request.form['name']
+        email=request.form['email']
+        password=request.form['password']
 
-conn = sqlite3.connect('team8.db')
-print ("Opened database successfully")
+        register_user_to_db(name,email,password)
+        return redirect(url_for('index'))
 
-#conn.execute('CREATE TABLE users (name TEXT, email TEXT, password TEXT)')
-#print ("Table created successfully");
-#conn.close()
+    else:
+        return render_template('index.html')
 
+@app.route("/valid_login",methods=["POST","GET"])
+def valid_login():
+    if request.method=='POST':
+        email=request.form['email']
+        password=request.form['password']
 
+        if check_user(email,password):
+            session['email']=email
+        
+        return redirect(url_for('home'))
 
+    else:
+        redirect(url_for('wrong'))
+@app.route('/home',methods=["POST","GET"])
+def home():
+    if 'email' in session:
+        return render_template('home.html',email=session['email'])
+    else:
+        return render_template('wrong.html')
 
-@app.route("/signin",methods = ["POST","GET"])  
-def signin():  
-    msg = "msg"  
-    if request.method == "POST":  
-        try:  
-            name = request.form["name"]  
-            email = request.form["email"]  
-            password = request.form["password"]  
-            with sqlite3.connect("team8.db") as con:  
-                cur = con.cursor()  
-                cur.execute("INSERT into users (name, email, password) values (?,?,?)",(name,email,password))  
-                con.commit()  
-                msg = "User successfully Added"  
-        except:  
-            con.rollback()  
-            msg = "We can not add the employee to the list"  
-        finally:  
-            return render_template("success.html",msg = msg)  
-            con.close()
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
 if __name__=='__main__':
-    app.run(debug=True)
+    app.run(port=2022,debug=True)
